@@ -1,0 +1,6 @@
+﻿services:
+  awesomeshop.services.apigateway:
+    image: awesomeshop.services.apigateway
+    build:
+      context: .
+      dockerfile: src/AwesomeShop.Services.ApiGateway/Dockerfile

@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest # Utilizamos a imagem oficial do MongoDB
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+#  mongo-express:
+#    image: mongo-express:latest # Mongo Express(Interface Web)
+#    container_name: mongo-express
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      - ME_CONFIG_MONGODB_SERVER=mongodb
+#      - ME_CONFIG_MONGODB_PORT=27017
+#    depends_on:
+#      - mongodb
+  
+  rabbitmq:
+    image: rabbitmq:3-management-alpine # Utilizamos a imagem oficial do RabbitMQ com suporte à interface web
+    container_name: rabbitmq
+    restart: always   
+    ports:     
+      - "5672:5672" # Porta padrão do RabbitMQ para a comunicação AMQP
+      - "15672:15672" # Porta da interface web do RabbitMQ  
+  
+  redisdb:
+    image: redis:alpine
+    container_name: redisdb
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+  
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    environment:
+      - REDIS_HOSTS=local:redisdb:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redisdb
+
+#  customer.api:
+#    image: ${DOCKER_REGISTRY-}customer.api    
+#    container_name: customer.api
+#    build:
+#      context: .
+#      dockerfile: AwesomeShop.Services.Customers/src/AwesomeShop.Services.Customers.Api/Dockerfile
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - "Mongo:Database=customers-service"
+#      - "Mongo:ConnectionString=mongodb://mongodb:27017"
+#    ports:
+#      - "5001:80"   
+#    depends_on:
+#      - mongodb    
+#      - rabbitmq
+  
+  apigateway:
+    image: apigateway
+    build:
+      context: .
+      dockerfile: AwesomeShop.Services.ApiGateway/src/AwesomeShop.Services.ApiGateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development     
+    ports:
+      - "5000:80"    
+      
+volumes:
+  mongodb_data:
+  redis_data:

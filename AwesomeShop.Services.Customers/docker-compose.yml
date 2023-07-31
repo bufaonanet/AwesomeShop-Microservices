@@ -1,0 +1,6 @@
+﻿services:
+  awesomeshop.services.customers.api:
+    image: awesomeshop.services.customers.api
+    build:
+      context: .
+      dockerfile: src/AwesomeShop.Services.Customers.Api/Dockerfile
